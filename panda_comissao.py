@@ -1,4 +1,4 @@
-# sistema_10_porcento.py
+import msvcrt
 
 # ==========================
 # CADASTRO FIXO DE FUNCIONÁRIOS
@@ -6,14 +6,13 @@
 
 equipes = {
     "ATENDIMENTO": [
-        "ALEX", "RAFA", "ERI", "NAARIS", "GABY", "ISA", "MARCELE", "SAMUEL"
+        "RAFA", "ERI", "NAARIS", "GABY", "ISA", "MARCELE", "THAINA", "RHUANNA", "HIGOR"
     ],
     "COZINHA": [
-        "RONNY", "PEDRO", "RENATIN", "ZEQUINHA", "CALINE", "SANDRA",
-        "ELIANE", "STEFANIE", "THAYNARA"
+        "RONNY", "PEDRO", "RENATIN", "ZEQUINHA", "CALINE", "SANDRA", "STEFANIE", "NARJA", "THAYNARA"
     ],
     "OUTROS": [
-        "DANIEL", "RAQUEL", "ELIZA"
+        "ELIANE", "RAQUEL", "ELIZA"
     ]
 }
 
@@ -27,7 +26,7 @@ pessoas_dia = {}
 totais = {}
 
 # ==========================
-# FUNÇÃO: MOSTRAR EQUIPE COM NÚMEROS FIXOS
+# MOSTRAR EQUIPE COM NÚMEROS FIXOS
 # ==========================
 def mostrar_equipes():
     print("\n=== LISTA DE FUNCIONÁRIOS ===")
@@ -44,6 +43,7 @@ def mostrar_equipes():
 # ==========================
 # INÍCIO DO SISTEMA
 # ==========================
+
 print("=== CADASTRO DOS VALORES DE 10% ===")
 for dia in dias:
     entrada = input(f"Digite o valor dos 10% de {dia}: R$ ").replace(",", ".")
@@ -54,31 +54,45 @@ for dia in dias:
         exit(1)
     valores[dia] = valor
 
-# Mostra lista de funcionários numerados
+# Mostrar lista de funcionários numerados
 mapa = mostrar_equipes()
 
 # ==========================
-# SELEÇÃO DE FUNCIONÁRIOS POR DIA
+# SELEÇÃO DE FUNCIONÁRIOS POR DIA — ENTER inclui, ESC pula
 # ==========================
 for dia in dias:
     print(f"\n--- {dia.upper()} ---")
-    entrada = input("Digite os números de quem trabalhou (separe por vírgula): ")
+    print("Para cada funcionário:")
+    print("  ENTER = trabalhou")
+    print("  ESC   = não trabalhou\n")
 
-    if not entrada.strip():
-        print("Nenhum funcionário cadastrado neste dia.")
-        continue
+    lista_pessoas = []
 
-    try:
-        indices = [int(x.strip()) for x in entrada.split(",") if x.strip()]
-    except ValueError:
-        print("Entrada inválida! Use apenas números separados por vírgula.")
-        continue
+    for indice in sorted(mapa.keys()):
+        pessoa = mapa[indice]
+        print(f"{pessoa}: ", end="", flush=True)
 
-    lista_pessoas = [mapa[i] for i in indices if i in mapa]
+        while True:
+            tecla = msvcrt.getch()
+
+            if tecla == b'\r':  # ENTER → inclui
+                lista_pessoas.append(pessoa)
+                print("✔ Incluído")
+                break
+
+            elif tecla == b'\x1b':  # ESC → não inclui
+                print("✖ Ignorado")
+                break
+
+            else:
+                # Se apertar outra tecla, não avança
+                print("\nUse apenas ENTER ou ESC.")
+                print(f"{pessoa}: ", end="", flush=True)
+
     pessoas_dia[dia] = lista_pessoas
 
     if not lista_pessoas:
-        print(f"Ninguém cadastrado na {dia}.")
+        print(f"\nNenhum funcionário trabalhou na {dia}.")
         continue
 
     valor_total = valores[dia]
@@ -90,6 +104,7 @@ for dia in dias:
 # ==========================
 # MOSTRAR TOTAL SEMANAL
 # ==========================
+
 print("\n=== TOTAL SEMANAL ===")
 print("-" * 30)
 for pessoa, total in sorted(totais.items()):
@@ -97,8 +112,9 @@ for pessoa, total in sorted(totais.items()):
 print("-" * 30)
 
 # ==========================
-# SALVAR RESULTADO (opcional)
+# SALVAR RESULTADO
 # ==========================
+
 salvar = input("\nDeseja salvar o resultado em um arquivo? (s/n): ").lower()
 if salvar == "s":
     with open("resultado_10_porcento.txt", "w", encoding="utf-8") as f:
